@@ -11,6 +11,10 @@ Herdr runs on macOS only. The files here assume macOS paths and tools.
 |---|---|
 | `layouts/example.json` | A layout that uses only mods shipped with Herdr, plus `workspace-status-quiet`. |
 | `keys.json` | Example keymap. Global and terminal bindings, plus the `layout:example` section for the spaces-agents sidebar. |
+| `mods/spaces-agents/` | Left sidebar: spaces and their agents, with state age and memory per space. Shows sub agents when `hooks/herdr-subagent-hook` is installed. |
+| `mods/tabs-live/` | Top tab strip with window controls. |
+| `mods/usage-status/` | Bottom-bar Claude usage (5-hour and weekly) and service status. Needs the usage cache writer described below. |
+| `mods/closed-tabs/` | `cmd-shift-t` list of recently closed tabs. Reads the history written by `bin/herdr-tab-recorder`. |
 | `mods/workspace-status-quiet/` | A copy of the built-in `workspace-status` mod with the "⌘⇧P commands" hint removed. |
 | `contrib/spectra/` | Optional mods for projects that use Spectra (OpenSpec) changes. See its dependencies below. |
 | `mods/resume-banner/` | A bottom banner that offers to resume Claude sessions after a reboot. Needs `bin/herdr-tab-recorder`. |
@@ -91,7 +95,11 @@ Both scripts need `python3` on `PATH`. They only work inside a Herdr terminal. O
 
 | Item | Needs | Notes |
 |---|---|---|
-| `layouts/example.json` | Built-in mods: `workspace-chrome`, `spaces-agents`, `tabs-live`, `workspace-status`, `usage-status`, `files`, `changes`, `pane`. Plus `resume-banner` from this repo. | Check each folder exists in `~/.config/herdr-app/mods`. |
+| `layouts/example.json` | Built-in mods: `workspace-chrome`, `workspace-status`, `files`, `changes`, `pane`. From this repo: `spaces-agents`, `tabs-live`, `usage-status`, `resume-banner`. | Check each folder exists in `~/.config/herdr-app/mods`. |
+| `mods/spaces-agents` | `hooks/herdr-subagent-hook` (for sub agents); `ps` | Modified from the shipped version. Reinstall after Herdr updates it. |
+| `mods/tabs-live` | Built-in `workspace-chrome` / `files` / `changes` / `pane` icons it loads | Modified from the shipped version. |
+| `mods/usage-status` | A ccstatusline `custom-command` writing `~/.cache/claude-rate-limits.json` (see the README's status line note); `ccstatusline` on `PATH` | Hides the usage part when the cache is missing. |
+| `mods/closed-tabs` | `bin/herdr-tab-recorder` running; `~/.cache/herdr-tab-recorder` history | Shows nothing when there is no history. |
 | `mods/resume-banner` | `~/.local/bin/herdr-tab-recorder` (from `bin/`) and its LaunchAgent; `top` (macOS), `python3` | Renders nothing until the recorder has something to resume. |
 | `bin/herdr-tab-recorder` | `python3`; macOS `top -l`; `claude` on `PATH` for resumed Claude tabs; LaunchAgent from `launchd/` | Writes its history and logs under `~/.cache/herdr-tab-recorder`. |
 | `mods/workspace-status-quiet` | Built-in `workspace-status` | A plain clone with the hint removed. Reinstall it after Herdr updates `workspace-status`. |
