@@ -13,6 +13,7 @@ Herdr runs on macOS only. The files here assume macOS paths and tools.
 | `keys.json` | Example keymap. Global and terminal bindings, plus the `layout:example` section for the spaces-agents sidebar. |
 | `mods/workspace-status-quiet/` | A copy of the built-in `workspace-status` mod with the "⌘⇧P commands" hint removed. |
 | `contrib/spectra/` | Optional mods for projects that use Spectra (OpenSpec) changes. See its dependencies below. |
+| `hooks/` | Two Claude Code hooks that connect Claude sessions to Herdr terminals. Optional, but `spaces-agents` shows no sub agents without the subagent hook. |
 
 ## Setup
 
@@ -30,6 +31,43 @@ Herdr runs on macOS only. The files here assume macOS paths and tools.
    ```
 5. Optional: copy `contrib/spectra/*` into `~/.config/herdr-app/mods/` and add the spectra blocks to a layout. Read the dependencies first.
 
+## Claude Code hooks
+
+`hooks/` has two scripts. Both read the hook JSON on stdin, print nothing, and always exit 0, so they can't block a session.
+
+- `herdr-session-label` labels the Herdr terminal with the Claude session id on `SessionStart`. On `SessionEnd` it removes the label if the session ended on purpose. It logs each session end to `~/.cache/herdr-tab-recorder/session-end.log`, and that log is optional.
+- `herdr-subagent-hook` records which built-in sub agents are running in which Herdr terminal, so the sidebar can list them. It reads `$HC_TERMINAL_ID`, which Herdr sets, and stores state in `~/.config/herdr-app/data/subagents.json`. It stores only the agent type, never the prompt.
+
+Install them:
+
+```sh
+mkdir -p ~/.local/bin
+cp hooks/herdr-session-label hooks/herdr-subagent-hook ~/.local/bin/
+```
+
+Then add these entries to `~/.claude/settings.json`. If you already have a `hooks` key, merge the events into it rather than replacing it:
+
+```json
+{
+  "hooks": {
+    "SessionStart": [
+      { "hooks": [ { "type": "command", "command": "~/.local/bin/herdr-session-label" } ] }
+    ],
+    "SessionEnd": [
+      { "hooks": [ { "type": "command", "command": "~/.local/bin/herdr-session-label end" } ] }
+    ],
+    "SubagentStart": [
+      { "hooks": [ { "type": "command", "command": "~/.local/bin/herdr-subagent-hook" } ] }
+    ],
+    "SubagentStop": [
+      { "hooks": [ { "type": "command", "command": "~/.local/bin/herdr-subagent-hook" } ] }
+    ]
+  }
+}
+```
+
+Both scripts need `python3` on `PATH`. They only work inside a Herdr terminal. Outside Herdr they do nothing.
+
 ## Dependencies
 
 | Item | Needs | Notes |
@@ -38,6 +76,8 @@ Herdr runs on macOS only. The files here assume macOS paths and tools.
 | `mods/workspace-status-quiet` | Built-in `workspace-status` | A plain clone with the hint removed. Reinstall it after Herdr updates `workspace-status`. |
 | `keys.json` | None | Bindings for shipped commands. |
 | `contrib/spectra/spectra-status` | Claude Code with a status line that prints `v<version> <8-hex session id>`; `hc`; an OpenSpec project (`openspec/changes/`) | Reads Claude's transcripts under `~/.claude/projects`. Shows nothing without a Claude session. |
+| `hooks/herdr-session-label` | `python3`; Claude Code hooks (entries above); runs inside a Herdr terminal |
+| `hooks/herdr-subagent-hook` | `python3`; Claude Code hooks (entries above); runs inside a Herdr terminal; `$HC_TERMINAL_ID` set by Herdr |
 | `contrib/spectra/spectra-panel` | The `spectra` CLI on `PATH`; `sh`; VS Code's `code` command (falls back to `open -a "Visual Studio Code"`) | Shows only inside an OpenSpec project. Clicks open `tasks.md` in VS Code. |
 
 ## Licence

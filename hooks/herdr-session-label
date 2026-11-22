@@ -1,0 +1,58 @@
+#!/usr/bin/python3
+"""Claude Code hook that keeps a `claude-session` label on the herdr terminal it runs in.
+
+  herdr-session-label        SessionStart: label the terminal with this session's id
+  herdr-session-label end    SessionEnd:   drop the label when the session was ended on purpose
+                             (/exit, ctrl-d, logout), so `resume-all` / the banner don't offer it.
+                             A reboot or killed core ends no session cleanly, so its label stays.
+
+Reads the hook JSON on stdin. Prints nothing (hook stdout can reach the conversation) and always
+exits 0 so it can never block a session. Every SessionEnd is appended to
+~/.cache/herdr-tab-recorder/session-end.log (reason + what was done) to check the reasons seen.
+"""
+import json
+import os
+import subprocess
+import sys
+import time
+
+HC = os.path.expanduser("~/.local/bin/hc")
+LOG = os.path.expanduser("~/.cache/herdr-tab-recorder/session-end.log")
+INTENTIONAL = {"prompt_input_exit", "logout"}  # NOT "clear": a new SessionStart follows it
+
+
+def hc(*args):
+    return subprocess.run([HC, *args], capture_output=True, text=True, timeout=5)
+
+
+def start(term, data):
+    sid = data.get("session_id")
+    if sid:
+        hc("label", term, f"claude-session={sid}")
+
+
+def end(term, data):
+    sid, reason = data.get("session_id"), data.get("reason")
+    action = "kept"
+    if reason in INTENTIONAL:
+        info = json.loads(hc("get", term).stdout or "{}")
+        # Only drop our own label: a newer session may already have replaced it.
+        if (info.get("labels") or {}).get("claude-session") == sid:
+            hc("label", term, "claude-session=")
+            action = "cleared"
+        else:
+            action = "kept (label is another session's)"
+    os.makedirs(os.path.dirname(LOG), exist_ok=True)
+    with open(LOG, "a") as f:
+        f.write(json.dumps({"at": time.strftime("%F %T"), "term": term, "session": sid,
+                            "reason": reason, "action": action}) + "\n")
+
+
+try:
+    term = os.environ.get("HC_TERMINAL_ID")
+    data = json.load(sys.stdin)
+    if term:
+        (end if sys.argv[1:] == ["end"] else start)(term, data)
+except Exception:
+    pass
+sys.exit(0)
