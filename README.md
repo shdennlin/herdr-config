@@ -41,9 +41,11 @@ To use `layouts/shawn-style.json`, also copy `contrib/spectra/*` into `~/.config
 | `settings.json` | Appearance: theme `dracula`, dark mode, MesloLGS NF 16, zoom 0.9. Sounds are left out (see the README). |
 | `themes/dracula.json` | The Dracula theme, with state colors for `working`, `done`, and `blocked`. |
 | `mods/picker/` | `cmd-p` picker: find and switch spaces, tabs, and agents. |
+| `mods/tab-switcher/` | `ctrl-tab` switcher: recent tabs, most recently used first. `spaces-agents` opens it. |
 | `mods/picker-cards/` | Card-style picker that `layout:shawn-style` binds to `cmd-p`. |
 | `mods/needs-you/` | Right-edge drawer for agents that need you. Used by `shawn-style.json`. |
 | `mods/picker/`, `mods/picker-cards/` | `im-select` on `PATH` (switches the input source while the picker is open; macOS) | Shows nothing if `im-select` is missing; the picker still works. |
+| `mods/tab-switcher/` | `spaces-agents` (it opens and feeds the switcher); `osascript` (macOS) for the window focus step | Shows nothing without `spaces-agents`. |
 | `mods/usage-status-tolerant/` | Bottom-bar usage with a tolerant cache reader. Used by `shawn-style.json`. Needs the usage cache. |
 | `hooks/` | Two Claude Code hooks that connect Claude sessions to Herdr terminals. Optional, but `spaces-agents` shows no sub agents without the subagent hook. |
 
