@@ -1,0 +1,181 @@
+{
+  "version": 4,
+  "lines": [
+    [
+      {
+        "id": "cde8e5c9-56ee-4cfb-b761-3c4ce119f43a",
+        "type": "custom-command",
+        "color": "",
+        "commandPath": "showdir --icon"
+      },
+      {
+        "id": "d85b93e5-bf1a-4e94-8b0e-ee2bd7683244",
+        "type": "separator",
+        "character": " "
+      },
+      {
+        "id": "edde2f3e-b73b-4e2e-9777-2844151061d2",
+        "type": "git-branch",
+        "color": "brightGreen",
+        "rawValue": false
+      },
+      {
+        "id": "ab7e0716-fd1a-4863-b7eb-cdd287fa5fb6",
+        "type": "custom-text",
+        "customText": " ",
+        "color": "brightBlack"
+      },
+      {
+        "id": "5690a2a5-fc1a-4962-aba2-8bac6f241540",
+        "type": "git-ahead-behind",
+        "color": "brightYellow",
+        "rawValue": false,
+        "metadata": {
+          "hide": "no-upstream"
+        }
+      },
+      {
+        "id": "31d1a317-a245-4732-bcca-1e61fa991e40",
+        "type": "custom-text",
+        "customText": " ",
+        "color": "brightBlack"
+      },
+      {
+        "id": "d9677af9-273c-4a4b-a5a6-e4fd77de4125",
+        "type": "git-changes",
+        "color": "brightYellow",
+        "rawValue": false
+      },
+      {
+        "id": "d7113718-d352-4219-aaab-fdea4dd39eec",
+        "type": "separator",
+        "character": " "
+      },
+      {
+        "id": "33031fa0-1016-4c41-aab7-9bafd0600d9f",
+        "type": "custom-command",
+        "color": "blue",
+        "commandPath": "d=$(jq -r '.workspace.current_dir // .cwd // empty'); [ -n \"$d\" ] && cd \"$d\" 2>/dev/null && g=$(git rev-parse --git-dir 2>/dev/null) && c=$(git rev-parse --git-common-dir 2>/dev/null) && case \"$g\" in \"$c\"/worktrees/*) printf '🌿%s' \"${g#$c/worktrees/}\";; esac; true"
+      },
+      {
+        "id": "4dbcefe0-cce9-4b11-95c7-9eb111cbec85",
+        "type": "separator",
+        "character": "│"
+      },
+      {
+        "id": "880186b6-65b3-4b5a-a7d0-e9e5161f4af4",
+        "type": "custom-command",
+        "color": "brightMagenta",
+        "commandPath": "jq -r '[.model.display_name, ({\"low\":\"L\",\"medium\":\"M\",\"high\":\"H\",\"xhigh\":\"X\",\"max\":\"Mx\"}[.effort.level // \"\"])] | map(select(. != null and . != \"\")) | join(\"·\")'"
+      },
+      {
+        "id": "2318404e-2ebd-47ed-b59a-0e2e5762ce5a",
+        "type": "separator",
+        "character": " "
+      },
+      {
+        "id": "ed1a735a-90e6-4966-842b-d57d06f6ed88",
+        "type": "custom-text",
+        "customText": "ctx ",
+        "color": "brightGreen"
+      },
+      {
+        "id": "a3932401-c334-43b4-901a-29d7f8fa68eb",
+        "type": "context-percentage",
+        "color": "brightGreen",
+        "rawValue": true
+      },
+      {
+        "id": "fa384130-18c2-4b31-a7fc-838d6c149057",
+        "type": "separator",
+        "character": " "
+      },
+      {
+        "id": "a53f6ebd-cfe2-4e7c-90a1-32f0b5dd3106",
+        "type": "custom-text",
+        "customText": "⚡",
+        "color": "yellow"
+      },
+      {
+        "id": "d8064892-7d18-4d87-b04f-516e571cc9b8",
+        "type": "cache-hit-rate",
+        "color": "yellow",
+        "rawValue": true,
+        "metadata": {
+          "hide": "empty"
+        }
+      },
+      {
+        "id": "8b8814a9-8a21-4d27-b459-46c2b6b742c7",
+        "type": "custom-text",
+        "customText": " ",
+        "color": "brightBlack"
+      },
+      {
+        "id": "keepalive-cache",
+        "type": "custom-command",
+        "color": "yellow",
+        "commandPath": "<agent-plugins>/plugins/cache-keepalive/bin/keepalive-cache --ttl 3600 --color",
+        "preserveColors": true
+      },
+      {
+        "id": "46d2154b-3a46-4fbf-9c76-b9c5d8e3f19b",
+        "type": "separator",
+        "character": "│"
+      },
+      {
+        "id": "798e94c8-e625-40ae-8be8-b9c51955d556",
+        "type": "version",
+        "color": "brightBlue",
+        "bold": true
+      },
+      {
+        "id": "f1d673d8-393d-4026-909c-7cf61cc6cef4",
+        "type": "separator",
+        "character": " "
+      },
+      {
+        "id": "d5b9d438-4c9a-4019-8466-bd9119a202d2",
+        "type": "custom-command",
+        "color": "brightBlack",
+        "commandPath": "jq -r '.session_id[0:8]'"
+      },
+      {
+        "id": "43271990-9d89-4514-8835-30ab448c0069",
+        "type": "custom-command",
+        "color": "",
+        "commandPath": "in=$(cat); f=\"$HOME/.cache/claude-rate-limits.json\"; l=\"$HOME/.local/share/claude-rate-limits/history.jsonl\"; sf=\"${l%/*}/sessions.json\"; sid=$(printf '%s' \"$in\" | jq -r '.session_id // empty' 2>/dev/null); row=$(printf '%s' \"$in\" | jq -c 'select(.rate_limits.five_hour != null and .rate_limits.seven_day != null) | {ts: (now|floor), five_pct: .rate_limits.five_hour.used_percentage, five_reset: .rate_limits.five_hour.resets_at, week_pct: .rate_limits.seven_day.used_percentage, week_reset: .rate_limits.seven_day.resets_at}' 2>/dev/null); [ -n \"$row\" ] && { mkdir -p \"${l%/*}\" \"${f%/*}\"; last=$(tail -n 1 \"$l\" 2>/dev/null | jq -c . 2>/dev/null); ses=$(jq -c . \"$sf\" 2>/dev/null); [ -n \"$ses\" ] || ses='{}'; res=$(jq -nc --arg sid \"$sid\" --argjson a \"$row\" --argjson b \"${last:-null}\" --argjson s \"$ses\" 'def key: [.five_pct, .five_reset, .week_pct, .week_reset]; (if ($s | type) == \"object\" then $s else {} end) as $S0 | (($S0[$sid]? | objects) // null) as $prev | ($a | key) as $k | ($S0 + {($sid): {k: $k, ts: $a.ts}} | with_entries(select((.value | objects | .ts // 0) > ($a.ts - 86400)))) as $S1 | (($sid != \"\") and $prev != null and ($prev.k != $k)) as $fresh | if $b != null and ($a.five_reset < $b.five_reset or $a.week_reset < $b.week_reset) then {out: null, state: $S1, acc: ($b | .ts = $a.ts)} else (if $b == null or $fresh then $a else $b end) as $acc | {ts: $a.ts, five_pct: $acc.five_pct, five_reset: $acc.five_reset, week_pct: $acc.week_pct, week_reset: $acc.week_reset} as $o | {out: (if $b == null or ($o | del(.ts)) != ($b | del(.ts)) or ($a.ts - $b.ts) > 600 then $o else null end), state: $S1, acc: $o} end' 2>/dev/null); if [ -n \"$res\" ]; then printf '%s' \"$res\" | jq -c .state > \"$sf.$$\" 2>/dev/null && mv \"$sf.$$\" \"$sf\"; out=$(printf '%s' \"$res\" | jq -c '.out // empty'); [ -n \"$out\" ] && printf '%s\\n' \"$out\" >> \"$l\"; printf '%s' \"$res\" | jq -ec '.acc | {rate_limits: {five_hour: {used_percentage: .five_pct, resets_at: .five_reset}, seven_day: {used_percentage: .week_pct, resets_at: .week_reset}}, ts: .ts}' > \"$f.$$\" 2>/dev/null && mv \"$f.$$\" \"$f\"; fi; } 2>/dev/null; rm -f \"$f.$$\" \"$sf.$$\" 2>/dev/null; true"
+      }
+    ]
+  ],
+  "flexMode": "full",
+  "compactThreshold": 60,
+  "colorLevel": 3,
+  "defaultPadding": "",
+  "inheritSeparatorColors": false,
+  "globalBold": false,
+  "gitCacheTtlSeconds": 10,
+  "minimalistMode": false,
+  "powerline": {
+    "enabled": false,
+    "separators": [
+      ""
+    ],
+    "separatorInvertBackground": [
+      false
+    ],
+    "startCaps": [],
+    "endCaps": [],
+    "autoAlign": false,
+    "continueThemeAcrossLines": false
+  },
+  "installation": {
+    "method": "pinned",
+    "installedVersion": "2.2.30"
+  },
+  "numberFormat": {
+    "percent": {
+      "style": "whole"
+    }
+  }
+}

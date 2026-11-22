@@ -11,7 +11,8 @@ The Herdr app runs on macOS, Linux, and Windows. The helper scripts in this repo
 - **Claude Code**, for the hooks, usage cache, and Spectra mods.
 - **`python3`**, for the hooks and `herdr-tab-recorder`.
 - **`jq`**, for the usage cache writer command.
-- **`ccstatusline`**, to run the usage cache writer. Install it and point Claude Code's `statusLine` at it. Without it, the usage bar stays hidden.
+- **`ccstatusline` 2.2.34** (tested), for the status line and the usage cache writer. See [Status line](#status-line-ccstatusline). Without the usage cache writer, the usage bar stays hidden.
+- **`showdir`**, the path helper in `ccstatusline/`.
 - **`hc`** (herdr-core's CLI), used by `spectra-status`.
 - Optional: the **`spectra` CLI** and VS Code's **`code`** command, for `spectra-panel`.
 
@@ -30,6 +31,7 @@ The Herdr app runs on macOS, Linux, and Windows. The helper scripts in this repo
 | `mods/resume-banner/` | A bottom banner that offers to resume Claude sessions after a reboot. Needs `bin/herdr-tab-recorder`. |
 | `bin/herdr-tab-recorder` | Remembers recently closed Herdr tabs and runs `resume-all` after a reboot. Runs as a LaunchAgent. |
 | `launchd/` | LaunchAgent template for `herdr-tab-recorder`. |
+| `ccstatusline/` | Status bar settings, the `showdir` helper, and the Claude Code entries for `ccstatusline`. |
 | `hooks/` | Two Claude Code hooks that connect Claude sessions to Herdr terminals. Optional, but `spaces-agents` shows no sub agents without the subagent hook. |
 
 ## Setup
@@ -73,6 +75,72 @@ f="$HOME/.cache/claude-rate-limits.json"; jq -ec 'select(.rate_limits != null) |
 ```
 
 The file is only rewritten while a Claude Code session is drawing its status line. The mod shows the age of the data and turns yellow when it is old. Without the file, the usage part stays hidden.
+
+## Status line (ccstatusline)
+
+`ccstatusline/` has a one-line status bar for Claude Code, with the project path, git state, model and effort, context, cache hit rate, version, session id, and the usage cache writer. Tested with `ccstatusline` 2.2.34.
+
+1. Install `ccstatusline` (tested version 2.2.34):
+   ```sh
+   npm install -g ccstatusline@2.2.34
+   ```
+2. Install the `showdir` helper, which prints the project path:
+   ```sh
+   cp ccstatusline/showdir ~/.local/bin/showdir && chmod 755 ~/.local/bin/showdir
+   ```
+3. Copy the settings. The `cache-keepalive` item uses a path that you need to set. Either clone [agent-plugins](https://github.com/shdennlin/agent-plugins) and replace `<agent-plugins>` with its path, or delete that item from the file.
+   ```sh
+   mkdir -p ~/.config/ccstatusline && cp ccstatusline/settings.json ~/.config/ccstatusline/settings.json
+   ```
+4. Add these entries to `~/.claude/settings.json`. Merge them into any existing `hooks` key:
+
+```json
+{
+  "statusLine": {
+    "type": "command",
+    "command": "ccstatusline",
+    "padding": 0,
+    "refreshInterval": 30
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Skill",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "ccstatusline --hook"
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "ccstatusline --hook"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "ccstatusline --hook"
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+5. Start a Claude Code session. The status bar should show within a few seconds.
+
+The usage writer item in `settings.json` is the one described in [Usage cache](#usage-cache).
 
 ## Claude Code hooks
 
@@ -118,6 +186,7 @@ Both scripts need `python3` on `PATH`. They only work inside a Herdr terminal. O
 | `layouts/example.json` | Built-in mods: `workspace-chrome`, `files`, `changes`. From this repo: `spaces-agents`, `tabs-live`, `usage-status`, `resume-banner`, `workspace-status-quiet`. The sidebar is a fixed 189 px (`resizable` is off in the layout). | Check each folder exists in `~/.config/herdr-app/mods`. |
 | `mods/spaces-agents` | `hooks/herdr-subagent-hook` (for sub agents); `ps` | Not confirmed as a stock Herdr mod. Check it after install. |
 | `mods/tabs-live` | Built-in `files`, `changes`, `pane` (icons it loads) | Not confirmed as a stock Herdr mod. Check it after install. |
+| `ccstatusline/` | `ccstatusline` 2.2.34, `showdir` in `~/.local/bin`, `jq`; optional `agent-plugins` clone for the `cache-keepalive` item | Your status line; copy to `~/.config/ccstatusline`. |
 | `mods/usage-status` | A ccstatusline `custom-command` writing `~/.cache/claude-rate-limits.json` (see [Usage cache](#usage-cache)); `ccstatusline` on `PATH` | Hides the usage part when the cache is missing. |
 | `mods/closed-tabs` | `bin/herdr-tab-recorder` running; `~/.cache/herdr-tab-recorder` history | Shows nothing when there is no history. |
 | `mods/resume-banner` | `~/.local/bin/herdr-tab-recorder` (from `bin/`) and its LaunchAgent; `top` (macOS), `python3` | Renders nothing until the recorder has something to resume. |

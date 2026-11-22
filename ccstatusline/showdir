@@ -1,0 +1,35 @@
+#!/usr/bin/env sh
+# Usage: showdir [--icon] [-n|--no-newline]
+
+icon=0; noline=0
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --icon) icon=1 ;;
+    -n|--no-newline) noline=1 ;;
+  esac
+  shift
+done
+
+prefix_icon=""
+if git_root=$(git rev-parse --show-toplevel 2>/dev/null); then
+  project=${git_root##*/}
+  case "$PWD" in
+    "$git_root"|"${git_root%/}") rel="";;
+    *) rel=${PWD#"$git_root"/};;
+  esac
+  [ "$icon" -eq 1 ] && prefix_icon="📂 "
+  out=$project${rel:+"/$rel"}
+else
+  path=$PWD
+  last=${path##*/}
+  parent=${path%/*}
+  second_last=${parent##*/}
+  [ "$second_last" = "$last" ] && out="$last" || out="$second_last/$last"
+  [ "$icon" -eq 1 ] && prefix_icon="📁 "
+fi
+
+if [ "$noline" -eq 1 ]; then
+  printf "%s%s" "$prefix_icon" "$out"
+else
+  printf "%s%s\n" "$prefix_icon" "$out"
+fi
