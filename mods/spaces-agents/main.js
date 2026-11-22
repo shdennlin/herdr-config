@@ -74,7 +74,7 @@ function treeRss(kids, rss, root) {
   return sum;
 }
 
-// Hover-expand (layouts/shawn-style-float.json passes props { hoverExpand: true }): the sidebar sits
+// Hover-expand (a layout passes props { hoverExpand: true }): the sidebar sits
 // at the left as a narrow rail and widens to WIDE while the pointer is on it, pushing the content.
 const DEFAULT_WIDE = 268;
 const wide = () => Number(localStorage.getItem("sa.width")) || DEFAULT_WIDE; // the width you last dragged it to
@@ -476,7 +476,7 @@ export default class SpacesAgents extends View {
 
   // Pointer on the sidebar: widen after a short pause (so sweeping past doesn't flash it), narrow again
   // shortly after it leaves, unless pinned.
-  // keys.json "layout:shawn-style-float": cmd-b -> "spaces-agents.pin". Pinned = stays wide; unpinned =
+  // keys.json "layout:<name>": cmd-b -> "spaces-agents.pin". Pinned = stays wide; unpinned =
   // tucked into a thin strip at the left that widens while the pointer is on it. Survives a restart.
   dragging() { return Date.now() - (this.manualAt ?? 0) < 2500; }
 

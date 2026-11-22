@@ -1,3 +1,5 @@
+// Derived from the built-in workspace-status mod in herdrdev/herdr-app (Apache-2.0, see LICENSE in this folder).
+// Changed: the "⌘⇧P commands" hint is removed from the footer. Everything else is unchanged.
 import { View, div, svg } from "gpui-kit";
 import { h_flex } from "gpui-base";
 import { spaces, agents, theme, run, window, keys } from "herdr";

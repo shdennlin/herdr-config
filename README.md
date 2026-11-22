@@ -3,13 +3,13 @@
 Example configuration for the [Herdr](https://herdr.dev) desktop app: a layout, a
 keymap, and a few mods. Copy what you want into `~/.config/herdr-app`.
 
-Herdr runs on macOS only. The files here assume macOS paths and tools.
+The Herdr app runs on macOS, Linux, and Windows. The helper scripts in this repo (`bin/`, `hooks/`, `launchd/`, and the `resume-banner` setup) are macOS-only: they use `open`, `pbcopy`, `top -l`, and launchd.
 
 ## What's included
 
 | Path | What it is |
 |---|---|
-| `layouts/example.json` | A layout that uses only mods shipped with Herdr, plus `workspace-status-quiet`. |
+| `layouts/example.json` | An example layout. It uses the mods in this repo plus a few built-in ones. |
 | `keys.json` | Example keymap. Global and terminal bindings, plus the `layout:example` section for the spaces-agents sidebar. |
 | `mods/spaces-agents/` | Left sidebar: spaces and their agents, with state age and memory per space. Shows sub agents when `hooks/herdr-subagent-hook` is installed. |
 | `mods/tabs-live/` | Top tab strip with window controls. |
@@ -27,14 +27,14 @@ Herdr runs on macOS only. The files here assume macOS paths and tools.
 1. Copy the layout and mods:
    ```sh
    cp layouts/example.json ~/.config/herdr-app/layouts/
-   cp -R mods/workspace-status-quiet ~/.config/herdr-app/mods/
+   cp -R mods/* ~/.config/herdr-app/mods/
    ```
 2. Merge the keymap. If you have no `~/.config/herdr-app/keys.json` yet, copy it. If you do, add the `layout:example` section and any global bindings you want to your existing file.
 3. Switch to the layout in Herdr with `cmd-shift-l`, or open the layout menu.
 4. Check the install:
    ```sh
    herdr-app status          # "errors" should be []
-   herdr-app check ~/.config/herdr-app/mods/workspace-status-quiet
+   for m in ~/.config/herdr-app/mods/*/; do herdr-app check "$m"; done
    ```
 5. Optional: copy `contrib/spectra/*` into `~/.config/herdr-app/mods/` and add the spectra blocks to a layout. Read the dependencies first.
 
@@ -105,14 +105,14 @@ Both scripts need `python3` on `PATH`. They only work inside a Herdr terminal. O
 
 | Item | Needs | Notes |
 |---|---|---|
-| `layouts/example.json` | Built-in mods: `workspace-chrome`, `workspace-status`, `files`, `changes`, `pane`. From this repo: `spaces-agents`, `tabs-live`, `usage-status`, `resume-banner`. | Check each folder exists in `~/.config/herdr-app/mods`. |
-| `mods/spaces-agents` | `hooks/herdr-subagent-hook` (for sub agents); `ps` | Modified from the shipped version. Reinstall after Herdr updates it. |
-| `mods/tabs-live` | Built-in `workspace-chrome` / `files` / `changes` / `pane` icons it loads | Modified from the shipped version. |
+| `layouts/example.json` | Built-in mods: `workspace-chrome`, `workspace-status`, `files`, `changes`. From this repo: `spaces-agents`, `tabs-live`, `usage-status`, `resume-banner`. | Check each folder exists in `~/.config/herdr-app/mods`. |
+| `mods/spaces-agents` | `hooks/herdr-subagent-hook` (for sub agents); `ps` | Not confirmed as a stock Herdr mod. Check it after install. |
+| `mods/tabs-live` | Built-in `files`, `changes`, `pane` (icons it loads) | Not confirmed as a stock Herdr mod. Check it after install. |
 | `mods/usage-status` | A ccstatusline `custom-command` writing `~/.cache/claude-rate-limits.json` (see [Usage cache](#usage-cache)); `ccstatusline` on `PATH` | Hides the usage part when the cache is missing. |
 | `mods/closed-tabs` | `bin/herdr-tab-recorder` running; `~/.cache/herdr-tab-recorder` history | Shows nothing when there is no history. |
 | `mods/resume-banner` | `~/.local/bin/herdr-tab-recorder` (from `bin/`) and its LaunchAgent; `top` (macOS), `python3` | Renders nothing until the recorder has something to resume. |
 | `bin/herdr-tab-recorder` | `python3`; macOS `top -l`; `claude` on `PATH` for resumed Claude tabs; LaunchAgent from `launchd/` | Writes its history and logs under `~/.cache/herdr-tab-recorder`. |
-| `mods/workspace-status-quiet` | Built-in `workspace-status` | A plain clone with the hint removed. Reinstall it after Herdr updates `workspace-status`. |
+| `mods/workspace-status-quiet` | Built-in `workspace-status` | Derived copy under Apache-2.0 (see its `LICENSE`), with the hint removed. It is not updated when Herdr updates `workspace-status`. |
 | `keys.json` | None | Bindings for shipped commands. |
 | `contrib/spectra/spectra-status` | Claude Code with a status line that prints `v<version> <8-hex session id>`; `hc`; an OpenSpec project (`openspec/changes/`) | Reads Claude's transcripts under `~/.claude/projects`. Shows nothing without a Claude session. |
 | `hooks/herdr-session-label` | `python3`; Claude Code hooks (entries above); runs inside a Herdr terminal |
@@ -121,4 +121,4 @@ Both scripts need `python3` on `PATH`. They only work inside a Herdr terminal. O
 
 ## Licence
 
-MIT. See [LICENSE](LICENSE).
+Code in this repo is MIT (see [LICENSE](LICENSE)), except `mods/workspace-status-quiet`. That mod is derived from the built-in `workspace-status` mod in [herdrdev/herdr-app](https://github.com/herdrdev/herdr-app), which is Apache-2.0. Its copy of the license and its attribution header are in the mod's folder.

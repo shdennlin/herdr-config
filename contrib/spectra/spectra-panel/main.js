@@ -5,7 +5,7 @@
 //
 // Data: the `spectra` CLI (list --json, --parked --json, --specs --json), run in the project root; the archived
 // count is the number of folders in openspec/changes/archive. Read-only apart from launching VS Code.
-// It is a floating block of the layout (see "floating" on work-body in layouts/shawn-style.json).
+// It is a floating block of the layout (see "floating" on work-body in the layout file).
 
 import { View, div, svg } from "gpui-kit";
 import { h_flex, v_flex } from "gpui-base";
