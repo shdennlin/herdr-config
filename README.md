@@ -13,6 +13,9 @@ Herdr runs on macOS only. The files here assume macOS paths and tools.
 | `keys.json` | Example keymap. Global and terminal bindings, plus the `layout:example` section for the spaces-agents sidebar. |
 | `mods/workspace-status-quiet/` | A copy of the built-in `workspace-status` mod with the "⌘⇧P commands" hint removed. |
 | `contrib/spectra/` | Optional mods for projects that use Spectra (OpenSpec) changes. See its dependencies below. |
+| `mods/resume-banner/` | A bottom banner that offers to resume Claude sessions after a reboot. Needs `bin/herdr-tab-recorder`. |
+| `bin/herdr-tab-recorder` | Remembers recently closed Herdr tabs and runs `resume-all` after a reboot. Runs as a LaunchAgent. |
+| `launchd/` | LaunchAgent template for `herdr-tab-recorder`. |
 | `hooks/` | Two Claude Code hooks that connect Claude sessions to Herdr terminals. Optional, but `spaces-agents` shows no sub agents without the subagent hook. |
 
 ## Setup
@@ -30,6 +33,22 @@ Herdr runs on macOS only. The files here assume macOS paths and tools.
    herdr-app check ~/.config/herdr-app/mods/workspace-status-quiet
    ```
 5. Optional: copy `contrib/spectra/*` into `~/.config/herdr-app/mods/` and add the spectra blocks to a layout. Read the dependencies first.
+
+## Resume after reboot (optional)
+
+`bin/herdr-tab-recorder` keeps a snapshot of every live Herdr tab. When a tab disappears, it appends the snapshot to a history file. After a reboot, `resume-all` types `claude --resume <id>` into each tab whose Claude session was recorded. The `resume-banner` mod offers that action in the Herdr bar. It renders nothing when there is nothing to resume.
+
+The recorder reads Claude session ids from the `herdr-session-label` hook, so install the hooks below first.
+
+```sh
+mkdir -p ~/.local/bin ~/.cache/herdr-tab-recorder ~/Library/LaunchAgents
+cp bin/herdr-tab-recorder ~/.local/bin/
+sed "s#__HOME__#$HOME#g" launchd/herdr-tab-recorder.plist.template \
+  > ~/Library/LaunchAgents/dev.herdr-config.herdr-tab-recorder.plist
+launchctl load ~/Library/LaunchAgents/dev.herdr-config.herdr-tab-recorder.plist
+```
+
+To remove it: `launchctl unload` the same file, then delete the plist and `~/.local/bin/herdr-tab-recorder`.
 
 ## Claude Code hooks
 
@@ -72,7 +91,9 @@ Both scripts need `python3` on `PATH`. They only work inside a Herdr terminal. O
 
 | Item | Needs | Notes |
 |---|---|---|
-| `layouts/example.json` | Built-in mods: `workspace-chrome`, `spaces-agents`, `tabs-live`, `workspace-status`, `usage-status`, `resume-banner`, `files`, `changes`, `pane` | Check each folder exists in `~/.config/herdr-app/mods`. |
+| `layouts/example.json` | Built-in mods: `workspace-chrome`, `spaces-agents`, `tabs-live`, `workspace-status`, `usage-status`, `files`, `changes`, `pane`. Plus `resume-banner` from this repo. | Check each folder exists in `~/.config/herdr-app/mods`. |
+| `mods/resume-banner` | `~/.local/bin/herdr-tab-recorder` (from `bin/`) and its LaunchAgent; `top` (macOS), `python3` | Renders nothing until the recorder has something to resume. |
+| `bin/herdr-tab-recorder` | `python3`; macOS `top -l`; `claude` on `PATH` for resumed Claude tabs; LaunchAgent from `launchd/` | Writes its history and logs under `~/.cache/herdr-tab-recorder`. |
 | `mods/workspace-status-quiet` | Built-in `workspace-status` | A plain clone with the hint removed. Reinstall it after Herdr updates `workspace-status`. |
 | `keys.json` | None | Bindings for shipped commands. |
 | `contrib/spectra/spectra-status` | Claude Code with a status line that prints `v<version> <8-hex session id>`; `hc`; an OpenSpec project (`openspec/changes/`) | Reads Claude's transcripts under `~/.claude/projects`. Shows nothing without a Claude session. |
