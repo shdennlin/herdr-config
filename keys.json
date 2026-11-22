@@ -80,7 +80,7 @@
     "cmd-w": "spaces-agents.close",
     "ctrl-tab": "spaces-agents.switch",
     "cmd-9": "spaces-agents.tab9",
-    "cmd-p": "mod.open:picker-cards",
+    "cmd-p": "mod.open:picker",
     "cmd-b": "spaces-agents.pin",
     "ctrl-shift-tab": "spaces-agents.switch-back"
   }
