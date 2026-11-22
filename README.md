@@ -105,14 +105,14 @@ Both scripts need `python3` on `PATH`. They only work inside a Herdr terminal. O
 
 | Item | Needs | Notes |
 |---|---|---|
-| `layouts/example.json` | Built-in mods: `workspace-chrome`, `workspace-status`, `files`, `changes`. From this repo: `spaces-agents`, `tabs-live`, `usage-status`, `resume-banner`. | Check each folder exists in `~/.config/herdr-app/mods`. |
+| `layouts/example.json` | Built-in mods: `workspace-chrome`, `files`, `changes`. From this repo: `spaces-agents`, `tabs-live`, `usage-status`, `resume-banner`, `workspace-status-quiet`. The sidebar is a fixed 189 px (`resizable` is off in the layout). | Check each folder exists in `~/.config/herdr-app/mods`. |
 | `mods/spaces-agents` | `hooks/herdr-subagent-hook` (for sub agents); `ps` | Not confirmed as a stock Herdr mod. Check it after install. |
 | `mods/tabs-live` | Built-in `files`, `changes`, `pane` (icons it loads) | Not confirmed as a stock Herdr mod. Check it after install. |
 | `mods/usage-status` | A ccstatusline `custom-command` writing `~/.cache/claude-rate-limits.json` (see [Usage cache](#usage-cache)); `ccstatusline` on `PATH` | Hides the usage part when the cache is missing. |
 | `mods/closed-tabs` | `bin/herdr-tab-recorder` running; `~/.cache/herdr-tab-recorder` history | Shows nothing when there is no history. |
 | `mods/resume-banner` | `~/.local/bin/herdr-tab-recorder` (from `bin/`) and its LaunchAgent; `top` (macOS), `python3` | Renders nothing until the recorder has something to resume. |
 | `bin/herdr-tab-recorder` | `python3`; macOS `top -l`; `claude` on `PATH` for resumed Claude tabs; LaunchAgent from `launchd/` | Writes its history and logs under `~/.cache/herdr-tab-recorder`. |
-| `mods/workspace-status-quiet` | Built-in `workspace-status` | Derived copy under Apache-2.0 (see its `LICENSE`), with the hint removed. It is not updated when Herdr updates `workspace-status`. |
+| `mods/workspace-status-quiet` | None beyond itself | Derived copy of the built-in `workspace-status` under Apache-2.0 (see its `LICENSE`), with the hint removed. It doesn't update when Herdr updates `workspace-status`. |
 | `keys.json` | None | Bindings for shipped commands. |
 | `contrib/spectra/spectra-status` | Claude Code with a status line that prints `v<version> <8-hex session id>`; `hc`; an OpenSpec project (`openspec/changes/`) | Reads Claude's transcripts under `~/.claude/projects`. Shows nothing without a Claude session. |
 | `hooks/herdr-session-label` | `python3`; Claude Code hooks (entries above); runs inside a Herdr terminal |

@@ -56,7 +56,7 @@
         }
       ],
       "size": {
-        "px": 6
+        "px": 189
       },
       "min": 4,
       "max": 480,
@@ -165,7 +165,7 @@
               "id": "status",
               "type": "block",
               "content": {
-                "mod": "workspace-status"
+                "mod": "workspace-status-quiet"
               },
               "size": {
                 "weight": 1
