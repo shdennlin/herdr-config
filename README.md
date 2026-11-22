@@ -13,7 +13,7 @@ Herdr runs on macOS only. The files here assume macOS paths and tools.
 | `keys.json` | Example keymap. Global and terminal bindings, plus the `layout:example` section for the spaces-agents sidebar. |
 | `mods/spaces-agents/` | Left sidebar: spaces and their agents, with state age and memory per space. Shows sub agents when `hooks/herdr-subagent-hook` is installed. |
 | `mods/tabs-live/` | Top tab strip with window controls. |
-| `mods/usage-status/` | Bottom-bar Claude usage (5-hour and weekly) and service status. Needs the usage cache writer described below. |
+| `mods/usage-status/` | Bottom-bar Claude usage (5-hour and weekly) and service status. Needs the usage cache writer in [Usage cache](#usage-cache). |
 | `mods/closed-tabs/` | `cmd-shift-t` list of recently closed tabs. Reads the history written by `bin/herdr-tab-recorder`. |
 | `mods/workspace-status-quiet/` | A copy of the built-in `workspace-status` mod with the "⌘⇧P commands" hint removed. |
 | `contrib/spectra/` | Optional mods for projects that use Spectra (OpenSpec) changes. See its dependencies below. |
@@ -53,6 +53,16 @@ launchctl load ~/Library/LaunchAgents/dev.herdr-config.herdr-tab-recorder.plist
 ```
 
 To remove it: `launchctl unload` the same file, then delete the plist and `~/.local/bin/herdr-tab-recorder`.
+
+## Usage cache
+
+`mods/usage-status` only reads `~/.cache/claude-rate-limits.json`. Something has to write it. Claude Code sends `rate_limits` in each status line update, so a ccstatusline `custom-command` item can save it. Add this item to your ccstatusline config, with its output empty so nothing shows:
+
+```sh
+f="$HOME/.cache/claude-rate-limits.json"; jq -ec 'select(.rate_limits != null) | {rate_limits, ts: (now|floor)}' > "$f.$$" 2>/dev/null && mv "$f.$$" "$f" || rm -f "$f.$$"
+```
+
+The file is only rewritten while a Claude Code session is drawing its status line. The mod shows the age of the data and turns yellow when it is old. Without the file, the usage part stays hidden.
 
 ## Claude Code hooks
 
@@ -98,7 +108,7 @@ Both scripts need `python3` on `PATH`. They only work inside a Herdr terminal. O
 | `layouts/example.json` | Built-in mods: `workspace-chrome`, `workspace-status`, `files`, `changes`, `pane`. From this repo: `spaces-agents`, `tabs-live`, `usage-status`, `resume-banner`. | Check each folder exists in `~/.config/herdr-app/mods`. |
 | `mods/spaces-agents` | `hooks/herdr-subagent-hook` (for sub agents); `ps` | Modified from the shipped version. Reinstall after Herdr updates it. |
 | `mods/tabs-live` | Built-in `workspace-chrome` / `files` / `changes` / `pane` icons it loads | Modified from the shipped version. |
-| `mods/usage-status` | A ccstatusline `custom-command` writing `~/.cache/claude-rate-limits.json` (see the README's status line note); `ccstatusline` on `PATH` | Hides the usage part when the cache is missing. |
+| `mods/usage-status` | A ccstatusline `custom-command` writing `~/.cache/claude-rate-limits.json` (see [Usage cache](#usage-cache)); `ccstatusline` on `PATH` | Hides the usage part when the cache is missing. |
 | `mods/closed-tabs` | `bin/herdr-tab-recorder` running; `~/.cache/herdr-tab-recorder` history | Shows nothing when there is no history. |
 | `mods/resume-banner` | `~/.local/bin/herdr-tab-recorder` (from `bin/`) and its LaunchAgent; `top` (macOS), `python3` | Renders nothing until the recorder has something to resume. |
 | `bin/herdr-tab-recorder` | `python3`; macOS `top -l`; `claude` on `PATH` for resumed Claude tabs; LaunchAgent from `launchd/` | Writes its history and logs under `~/.cache/herdr-tab-recorder`. |
