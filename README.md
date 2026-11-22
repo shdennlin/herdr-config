@@ -5,6 +5,16 @@ keymap, and a few mods. Copy what you want into `~/.config/herdr-app`.
 
 The Herdr app runs on macOS, Linux, and Windows. The helper scripts in this repo (`bin/`, `hooks/`, `launchd/`, and the `resume-banner` setup) are macOS-only: they use `open`, `pbcopy`, `top -l`, and launchd.
 
+## Requirements
+
+- **Herdr app 0.1.16 or later** (tested on 0.1.16). Herdr runs on macOS, Linux, and Windows, but the helper scripts below are macOS-only.
+- **Claude Code**, for the hooks, usage cache, and Spectra mods.
+- **`python3`**, for the hooks and `herdr-tab-recorder`.
+- **`jq`**, for the usage cache writer command.
+- **`ccstatusline`**, to run the usage cache writer. Install it and point Claude Code's `statusLine` at it. Without it, the usage bar stays hidden.
+- **`hc`** (herdr-core's CLI), used by `spectra-status`.
+- Optional: the **`spectra` CLI** and VS Code's **`code`** command, for `spectra-panel`.
+
 ## What's included
 
 | Path | What it is |
@@ -27,7 +37,7 @@ The Herdr app runs on macOS, Linux, and Windows. The helper scripts in this repo
 1. Copy the layout and mods:
    ```sh
    cp layouts/example.json ~/.config/herdr-app/layouts/
-   cp -R mods/* ~/.config/herdr-app/mods/
+   cp -r mods/* ~/.config/herdr-app/mods/
    ```
 2. Merge the keymap. If you have no `~/.config/herdr-app/keys.json` yet, copy it. If you do, add the `layout:example` section and any global bindings you want to your existing file.
 3. Switch to the layout in Herdr with `cmd-shift-l`, or open the layout menu.
