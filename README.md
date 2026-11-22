@@ -7,6 +7,11 @@ The Herdr app runs on macOS, Linux, and Windows. The helper scripts in this repo
 
 ## Requirements
 
+`settings.json` has no sounds. Herdr's default sounds are used. To add your own, set `sounds` to `enabled`, `done`, and `blocked` paths. The win98 sounds are part of Herdr, not this repo.
+
+To use `layouts/shawn-style.json`, also copy `contrib/spectra/*` into `~/.config/herdr-app/mods/`, and set `layouts/shawn-style.json` as the active layout. `settings.json` overwrites your settings, so merge it instead if you have your own.
+
+
 - **Herdr app 0.1.16 or later** (tested on 0.1.16). Herdr runs on macOS, Linux, and Windows, but the helper scripts below are macOS-only.
 - **Claude Code**, for the hooks, usage cache, and Spectra mods.
 - **`python3`**, for the hooks and `herdr-tab-recorder`.
@@ -20,6 +25,7 @@ The Herdr app runs on macOS, Linux, and Windows. The helper scripts in this repo
 
 | Path | What it is |
 |---|---|
+| `layouts/shawn-style.json` | The author's full layout. It needs the `contrib/spectra` mods, `needs-you`, `usage-status-tolerant`, and the usage cache. Copy it only if you want that exact setup. |
 | `layouts/example.json` | An example layout. It uses the mods in this repo plus a few built-in ones. |
 | `keys.json` | Example keymap. Global and terminal bindings, plus the `layout:example` section for the spaces-agents sidebar. |
 | `mods/spaces-agents/` | Left sidebar: spaces and their agents, with state age and memory per space. Shows sub agents when `hooks/herdr-subagent-hook` is installed. |
@@ -32,6 +38,10 @@ The Herdr app runs on macOS, Linux, and Windows. The helper scripts in this repo
 | `bin/herdr-tab-recorder` | Remembers recently closed Herdr tabs and runs `resume-all` after a reboot. Runs as a LaunchAgent. |
 | `launchd/` | LaunchAgent template for `herdr-tab-recorder`. |
 | `ccstatusline/` | Status bar settings, the `showdir` helper, and the Claude Code entries for `ccstatusline`. |
+| `settings.json` | Appearance: theme `dracula`, dark mode, MesloLGS NF 16, zoom 0.9. Sounds are left out (see the README). |
+| `themes/dracula.json` | The Dracula theme, with state colors for `working`, `done`, and `blocked`. |
+| `mods/needs-you/` | Right-edge drawer for agents that need you. Used by `shawn-style.json`. |
+| `mods/usage-status-tolerant/` | Bottom-bar usage with a tolerant cache reader. Used by `shawn-style.json`. Needs the usage cache. |
 | `hooks/` | Two Claude Code hooks that connect Claude sessions to Herdr terminals. Optional, but `spaces-agents` shows no sub agents without the subagent hook. |
 
 ## Setup
