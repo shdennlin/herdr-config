@@ -65,7 +65,8 @@ export default class Tabs extends View {
       // program's own name don't count as a title.
       const lead = panes().find(p => p.tab === c.id && p.program?.agent);
       const live = (lead?.title ?? "").replace(/^[^\p{L}\p{N}]+/u, "").trim();
-      const telling = live && live !== lead.program.name && !/^[~/]|^[A-Za-z]:\\/.test(live) && !live.includes("@") && live.toLowerCase() !== lead.program.key;
+      // An editor's window title (Neovim left behind after it exits) is not the session name either.
+      const telling = live && live !== lead.program.name && !/^[~/]|^[A-Za-z]:\\/.test(live) && !live.includes("@") && live.toLowerCase() !== lead.program.key && !/ - Nvim$/i.test(live);
       // No agent and nobody named it (a plain shell): its folder, same as the sidebar row, not "1".
       const shell = !c.named && !lead ? panes().find(p => p.tab === c.id && p.terminal) : null;
       const dir = shell?.cwd ? shell.cwd.replace(/\/+$/, "").split("/").pop() : "";

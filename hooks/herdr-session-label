@@ -5,6 +5,10 @@
   herdr-session-label end    SessionEnd:   drop the label when the session was ended on purpose
                              (/exit, ctrl-d, logout), so `resume-all` / the banner don't offer it.
                              A reboot or killed core ends no session cleanly, so its label stays.
+  herdr-session-label prompt UserPromptSubmit: re-set the terminal title, so a /rename shows up.
+
+The terminal title (OSC 0) is set to the session's custom title (what /rename writes), so tabs
+that follow the pane title show the session name. Written to /dev/tty, not stdout.
 
 Reads the hook JSON on stdin. Prints nothing (hook stdout can reach the conversation) and always
 exits 0 so it can never block a session. Every SessionEnd is appended to
@@ -25,10 +29,41 @@ def hc(*args):
     return subprocess.run([HC, *args], capture_output=True, text=True, timeout=5)
 
 
+def custom_title(path):
+    """Last custom-title record in the transcript (written by /rename), or None."""
+    title = None
+    try:
+        with open(os.path.expanduser(path or ""), errors="replace") as f:
+            for line in f:
+                if '"custom-title"' not in line:
+                    continue
+                try:
+                    rec = json.loads(line)
+                except ValueError:
+                    continue
+                if rec.get("type") == "custom-title" and rec.get("customTitle"):
+                    title = rec["customTitle"]
+    except OSError:
+        pass
+    return title
+
+
+def set_title(data):
+    title = custom_title(data.get("transcript_path"))
+    if not title:
+        return
+    try:
+        with open("/dev/tty", "w") as tty:
+            tty.write(f"\x1b]0;{title}\x07")
+    except OSError:
+        pass
+
+
 def start(term, data):
     sid = data.get("session_id")
     if sid:
         hc("label", term, f"claude-session={sid}")
+    set_title(data)
 
 
 def end(term, data):
@@ -52,7 +87,12 @@ try:
     term = os.environ.get("HC_TERMINAL_ID")
     data = json.load(sys.stdin)
     if term:
-        (end if sys.argv[1:] == ["end"] else start)(term, data)
+        if sys.argv[1:] == ["end"]:
+            end(term, data)
+        elif sys.argv[1:] == ["prompt"]:
+            set_title(data)
+        else:
+            start(term, data)
 except Exception:
     pass
 sys.exit(0)
